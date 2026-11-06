@@ -15,7 +15,7 @@ if [ -z "$task" ]; then echo "All tasks are done (or blocked). See progress/PROG
 file=$(ls tasks/"$task"-*.md 2>/dev/null | head -1 || true)
 if [ -z "$file" ]; then echo "No task file found for $task"; exit 1; fi
 
-prompt="Read AGENTS.md, then do task $task exactly as written in $file. Follow the session protocol in AGENTS.md. Stop when the task is finished."
+prompt="Read AGENTS.md, then do task $task exactly as written in $file. Follow the session protocol in AGENTS.md, including the final git commit and sync (pull --rebase, then push to origin if it exists). Stop when the task is finished."
 echo "$prompt"
 if [ -n "${PI_CMD:-}" ]; then
   $PI_CMD "$prompt"

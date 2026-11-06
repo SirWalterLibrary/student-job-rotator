@@ -11,7 +11,18 @@ Timezone: America/Chicago (Minnesota). Teacher: Mohamed.
 4. Run the task's "Done when" commands. Fix until they pass.
 5. Update `progress/PROGRESS.md`: change `[ ]` to `[x]`, add a short note (date, test count).
    Put surprises or deviations in `progress/NOTES.md`.
-6. `git add -A && git commit -m "T05: <title>"`. Then stop.
+6. Commit and sync, then stop:
+   ```bash
+   git add -A && git commit -m "T05: <title>"
+   if git remote get-url origin >/dev/null 2>&1; then
+     git pull --rebase --autostash && git push -u origin HEAD
+   else
+     echo "No 'origin' remote configured: skipping sync"
+   fi
+   ```
+   Never force-push. If the pull or push fails (conflict, auth, network), do not try to fix it: add
+   `BLOCKED sync: <error text>` to `progress/NOTES.md`, commit that note locally, and stop.
+   If there is no `origin`, say so in your final message so the teacher knows nothing was pushed.
 
 ## Hard rules
 - "Today" ALWAYS comes from `rotator.dates.central_today()`. Never `date.today()`, never `datetime.now()` without a timezone. In the browser, never compute today — use the `today` value from `/api/config`.

@@ -5,7 +5,7 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 
 | Status / Task | Title | Notes |
 |---|---|---|
-| [ ] T00 | Scaffold, config, health endpoint, pytest fixtures | |
+| [x] T00 | Scaffold, config, health endpoint, pytest fixtures | 2026-11-06: 5 tests passing; dev server serves /api/health. See NOTES.md for pytest.ini addition.
 | [ ] T01 | SQLite schema + db helpers + settings | |
 | [ ] T02 | Dates module (Central time, class days) | |
 | [ ] T03 | Scheduler core (pure fairness algorithm) | |
@@ -23,5 +23,5 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [ ] T15 | Demo seed, smoke script, acceptance pass, polish | |
 | [ ] T16 | Deploy to home server (human-run checklist) | |
 
-Last session: —
-Total tests passing: —
+Last session: T00 done 2026-11-06 (5 tests passing)
+Total tests passing: 5
