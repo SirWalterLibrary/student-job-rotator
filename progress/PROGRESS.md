@@ -1,0 +1,27 @@
+# PROGRESS
+
+Agent: after finishing a task change `[ ]` to `[x]` and fill in the notes (date, tests passing, anything odd).
+Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
+
+| Status / Task | Title | Notes |
+|---|---|---|
+| [ ] T00 | Scaffold, config, health endpoint, pytest fixtures | |
+| [ ] T01 | SQLite schema + db helpers + settings | |
+| [ ] T02 | Dates module (Central time, class days) | |
+| [ ] T03 | Scheduler core (pure fairness algorithm) | |
+| [ ] T04 | Roster API: students, jobs, volunteers | |
+| [ ] T05 | Schedule service: freeze + build sessions | |
+| [ ] T06 | Read API: config, today, calendar, queue | |
+| [ ] T07 | Actions: absent swap, cancel/restore day, manual override | |
+| [ ] T08 | Admin PIN, rate limit, export/import | |
+| [ ] T09 | Frontend shell, Islamic theme, tabs | |
+| [ ] T10 | Tab 1: Today / Next weekend | |
+| [ ] T11 | Tab 2: Monthly calendar | |
+| [ ] T12 | Teacher tools drawer: students, jobs, volunteers, up-next, settings | |
+| [ ] T13 | Action dialogs: absent swap, shift day, manual change, PIN unlock | |
+| [ ] T14 | Dockerize (dev + prod compose) | |
+| [ ] T15 | Demo seed, smoke script, acceptance pass, polish | |
+| [ ] T16 | Deploy to home server (human-run checklist) | |
+
+Last session: —
+Total tests passing: —
