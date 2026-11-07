@@ -1,0 +1,18 @@
+services:
+  job-rotator:
+    build: .
+    container_name: job-rotator
+    restart: always
+    env_file: .env
+    environment:
+      APP_ENV: production
+      TRUST_PROXY: "1"
+      TZ: America/Chicago
+    volumes:
+      - rotator_data:/data
+    networks: [npm_net]
+networks:
+  npm_net:
+    external: true
+volumes:
+  rotator_data:

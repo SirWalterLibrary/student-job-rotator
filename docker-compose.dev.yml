@@ -1,0 +1,11 @@
+services:
+  job-rotator:
+    build: .
+    ports: ["5055:8000"]
+    environment:
+      ADMIN_PIN: "1234"
+      APP_ENV: development
+    volumes:
+      - rotator_data:/data
+volumes:
+  rotator_data:

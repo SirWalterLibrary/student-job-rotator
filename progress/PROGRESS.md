@@ -19,9 +19,9 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [x] T11 | Tab 2: Monthly calendar | 2026-11-07: 110 tests passing (no new tests, frontend-only); Node DOM-stub against live server: 35 checks (grid, nav disable rules, cancelled/swap states, dialog + focus return, narrow stacked weekends, error/Retry, exact role match vs API). See NOTES.md. |
 | [x] T12 | Teacher tools drawer: students, jobs, volunteers, up-next, settings | 2026-11-07: 110 tests passing (no new, frontend-only); Node DOM-stub against the live server (ADMIN_PIN=1234, ?today=2026-11-06): 40 checks all pass (lock/login flow, 4 sections, add/rename/remove, job add + expand + volunteer ticks, reordering, queue, settings error, export/import round trip, focus/Esc, 401 re-lock, accordion). See NOTES.md for css/manage.css + manage-roster.js split. |
 | [x] T13 | Action dialogs: absent swap, shift day, manual change, PIN unlock | 2026-11-07: 110 tests passing (no new, UI-only); Node DOM-stub against the live server (ADMIN_PIN=1234, ?today=2026-11-07): 18 checks all pass (swap chip/toast/calendar ⇄, vacant + fairness, shift "No class" + Sunday equals pre-shift Saturday + restore, change options, lock, 401 re-lock, day dialog editable). See NOTES.md: one backend change (request lock in app.py — the task's refreshAll exposed a concurrency 500 in freeze_through) and the vacant-refill nuance. |
-| [ ] T14 | Dockerize (dev + prod compose) | |
+| [x] T14 | Dockerize (dev + prod compose) | 2026-11-07: all done-when checks pass (see NOTES.md): app on :5055 + PIN 1234, student survives restart, Minnesota date, healthy, uid 10001, production exits with clear error. |
 | [ ] T15 | Demo seed, smoke script, acceptance pass, polish | |
 | [ ] T16 | Deploy to home server (human-run checklist) | |
 
-Last session: T13 done 2026-11-07 (110 tests passing)
+Last session: T14 done 2026-11-07 (110 tests passing)
 Total tests passing: 110
