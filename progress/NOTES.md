@@ -4,6 +4,7 @@ Agent: append here. Keep entries short and dated.
 
 ## Deviations from the spec
 - T03: added a one-line module docstring to `rotator/scheduler.py` (AGENTS.md requires docstrings; the spec's code block has none). Algorithm copied verbatim, unchanged.
+- T04: spec 05 defines duplicate handling only for POST /api/students; I applied the same rule to jobs (active duplicate → 409; archived duplicate → re-activate, 200) following spec 01's general "re-adding an archived name re-activates the same row". Also: archiving a job keeps its `volunteers` rows (spec 01 only requires deleting future assignments) so re-activating restores the roster. `create_app` imports the roster blueprint lazily to avoid an app↔routes import cycle.
 
 ## BLOCKED
 - BLOCKED sync: T00 — `git push -u origin HEAD` failed: `fatal: could not read Username for 'https://github.com': Device not configured` (remote https://github.com/SirWalterLibrary/student-job-rotator.git; no stored credentials). The earlier `git pull --rebase` also failed only because origin has no branches yet and the local branch had no upstream. Commit 7473da5 ("T00: scaffold, config, health endpoint, pytest fixtures") is local; push it once GitHub credentials are available.

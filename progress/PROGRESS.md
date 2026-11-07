@@ -9,7 +9,7 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [x] T01 | SQLite schema + db helpers + settings | 2026-11-06: 13 tests passing (8 new). |
 | [x] T02 | Dates module (Central time, class days) | 2026-11-06: 31 tests passing (18 new). |
 | [x] T03 | Scheduler core (pure fairness algorithm) | 2026-11-06: 43 tests passing (12 new); purity grep clean. |
-| [ ] T04 | Roster API: students, jobs, volunteers | |
+| [x] T04 | Roster API: students, jobs, volunteers | 2026-11-06: 57 tests passing (14 new); see NOTES.md for job re-activation choice. |
 | [ ] T05 | Schedule service: freeze + build sessions | |
 | [ ] T06 | Read API: config, today, calendar, queue | |
 | [ ] T07 | Actions: absent swap, cancel/restore day, manual override | |
@@ -23,5 +23,5 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [ ] T15 | Demo seed, smoke script, acceptance pass, polish | |
 | [ ] T16 | Deploy to home server (human-run checklist) | |
 
-Last session: T03 done 2026-11-06 (43 tests passing)
-Total tests passing: 43
+Last session: T04 done 2026-11-06 (57 tests passing)
+Total tests passing: 57

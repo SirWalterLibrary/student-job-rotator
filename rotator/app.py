@@ -65,6 +65,10 @@ def create_app(config: dict | None = None) -> Flask:
         """Serve the single-page frontend."""
         return send_from_directory(app.static_folder, "index.html")
 
+    from .routes_roster import bp as roster_bp   # lazy: routes import get_conn from here
+
+    app.register_blueprint(roster_bp)
+
     return app
 
 
