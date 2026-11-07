@@ -1,9 +1,9 @@
-// Boot: load config, label Tab 1, and wire tab routing (hash + arrow keys).
-// T10/T11 render into the panels; this module only keeps them in a
-// "Loading…" placeholder state and tracks selection.
+// Boot: load config, render the selected tab, and wire tab routing (hash + arrow keys).
+// T10 renders Tab 1 (today.js); T11 renders Tab 2.
 
 import { h, clear, toast } from "./dom.js";
 import { api, storedPin } from "./api.js";
+import { renderToday, setTodayLabel } from "./today.js";
 
 /** Shared app state, imported by the other modules. */
 export const state = {
@@ -25,7 +25,7 @@ function placeholder(panelId) {
   panel.append(h("p", { class: "placeholder" }, "Loading…"));
 }
 
-/** Select a tab: ARIA state, hidden panels, and location.hash. */
+/** Select a tab: ARIA state, hidden panels, location.hash, and render. */
 function selectTab(name, month) {
   if (name !== "today" && name !== "calendar") name = "today";
   state.tab = name;
@@ -34,6 +34,7 @@ function selectTab(name, month) {
     document.getElementById(tab.id).setAttribute("aria-selected", selected ? "true" : "false");
     document.getElementById(tab.panel).hidden = !selected;
   }
+  if (name === "today") renderToday(document.getElementById("panel-today"));
   if (name === "calendar") state.month = month || (state.config ? state.config.today.slice(0, 7) : null);
   const hash = name === "calendar" ? (state.month ? `#calendar/${state.month}` : "#calendar") : "#today";
   if (location.hash !== hash) history.pushState(null, "", hash);
@@ -49,9 +50,7 @@ function applyHash() {
 
 /** Fetch /api/today once to choose the Tab 1 label ("Today" / "Next Weekend"). */
 async function refreshTabLabel() {
-  const button = document.getElementById("tab-today");
-  const data = await api.get("/api/today");
-  button.textContent = data.mode === "today" ? "Today" : "Next Weekend";
+  setTodayLabel((await api.get("/api/today")).mode);
 }
 
 /** Wire up keyboard tab switching (left/right move, Enter/Space activate). */
@@ -96,12 +95,12 @@ async function boot() {
   state.unlocked = !state.config.pin_required || Boolean(storedPin());
   wireTabs();
   wireHeader();
-  try {
-    await refreshTabLabel();
-  } catch (err) {
-    console.error(err); // keep the "Today" label; panels stay on their placeholder
-  }
   applyHash(); // honors #calendar or #calendar/YYYY-MM on reload; no-op otherwise
+  if (state.tab === "today") {
+    renderToday(document.getElementById("panel-today")); // also sets the Tab 1 label
+  } else {
+    refreshTabLabel().catch((err) => console.error(err)); // keep the label right on other tabs
+  }
   window.addEventListener("hashchange", applyHash);
   window.addEventListener("popstate", applyHash);
 }

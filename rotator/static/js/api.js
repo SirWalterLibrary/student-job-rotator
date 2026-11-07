@@ -26,6 +26,22 @@ export function clearPin() {
   sessionStorage.removeItem(PIN_KEY);
 }
 
+const TODAY_RE = /[?&]today=(\d{4}-\d{2}-\d{2})(?:&|$)/;
+
+/** The preview day from the URL (?today=YYYY-MM-DD), or null. */
+function urlToday() {
+  const match = location.search.match(TODAY_RE);
+  return match ? match[1] : null;
+}
+
+/** Append the URL's today= preview to a GET path.
+ *  The server ignores it unless ALLOW_TODAY_OVERRIDE is enabled. */
+function withToday(path) {
+  const today = urlToday();
+  if (today === null) return path;
+  return `${path}${path.includes("?") ? "&" : "?"}today=${today}`;
+}
+
 /** Perform a JSON request, adding X-Admin-Pin when a PIN is stored. */
 async function request(method, path, body) {
   const headers = { Accept: "application/json" };
@@ -58,8 +74,8 @@ async function request(method, path, body) {
 
 /** The app's API client. */
 export const api = {
-  /** GET path and parse JSON. */
-  get: (path) => request("GET", path),
+  /** GET path and parse JSON (adds the URL's today= preview). */
+  get: (path) => request("GET", withToday(path)),
   /** Send method + optional JSON body, parse JSON. */
   send: (method, path, body) => request(method, path, body),
 };
