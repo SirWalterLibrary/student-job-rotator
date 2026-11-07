@@ -1,11 +1,17 @@
 """Flask application factory."""
 import os
+import threading
 
 from flask import Flask, current_app, g, jsonify, request, send_from_directory
 
 from .config import load_config
 from .db import connect, init_db
 from .errors import RotatorError
+
+# The freeze step writes rows, so two concurrent /api requests could both try to
+# store the same auto assignment (UNIQUE date, student). Serialize /api requests;
+# for a single classroom this costs nothing.
+_API_LOCK = threading.Lock()
 
 
 def create_app(config: dict | None = None) -> Flask:
@@ -41,12 +47,22 @@ def create_app(config: dict | None = None) -> Flask:
         """Return a JSON 500."""
         return jsonify({"error": "Server error"}), 500
 
+    @app.before_request
+    def acquire_api_lock():
+        """Hold the request lock for every /api request so DB writes never race."""
+        if request.path.startswith("/api"):
+            _API_LOCK.acquire()
+            g.api_lock = True
+
     @app.teardown_appcontext
     def close_conn(err):
-        """Close the per-request database connection."""
+        """Close the per-request database connection and release the request lock."""
         conn = g.pop("conn", None)
         if conn is not None:
             conn.close()
+        if getattr(g, "api_lock", False):
+            g.api_lock = False
+            _API_LOCK.release()
 
     @app.after_request
     def no_cache(response):

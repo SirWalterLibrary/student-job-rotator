@@ -13,12 +13,12 @@ export function isUnlocked() {
   return !state.config.pin_required || Boolean(storedPin());
 }
 
-/** Record the locked/unlocked state and relabel the header button. */
+/** Record the locked/unlocked state, relabel the header button, and re-render. */
 function setUnlocked(value) {
   state.unlocked = value;
   const button = document.getElementById("teacher-tools");
-  if (!button) return;
-  button.textContent = !state.config.pin_required ? "Teacher tools" : (value ? "Lock" : "Teacher login");
+  if (button) button.textContent = !state.config.pin_required ? "Teacher tools" : (value ? "Lock" : "Teacher login");
+  window.dispatchEvent(new CustomEvent("kr:lockchange")); // today.js re-renders its buttons
 }
 
 /** The PIN dialog element, created once and reused. */

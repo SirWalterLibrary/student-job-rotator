@@ -4,14 +4,18 @@
 import { h, clear } from "./dom.js";
 import { api } from "./api.js";
 import { state } from "./app.js"; // referenced at call time only (circular import is safe)
+import { isUnlocked } from "./auth.js";
 import { hijriDate, longDate, monthName, weekdayName } from "./dates.js";
+import { openAbsentDialog, openShiftDialog, openRestoreConfirm, openChangeDialog, clearAssignment } from "./actions.js";
 
 const REFRESH_MS = 5 * 60 * 1000;
 
-let panel = null;      // #panel-today, set on the first renderToday()
-let timer = null;      // the one shared 5-minute interval
-let lastToday = null;  // today from the last successful /api/today response
-let inflight = false;  // guard against overlapping loads
+let panel = null;       // #panel-today, set on the first renderToday()
+let timer = null;       // the one shared 5-minute interval
+let lastToday = null;   // today from the last successful /api/today response
+let inflight = false;   // guard against overlapping loads
+let lastData = null;    // last successful /api/today response (re-render on lock change)
+let lockListenerOn = false; // the single kr:lockchange listener
 
 /** Label the Tab 1 button from the /api/today mode ("today" | "upcoming"). */
 export function setTodayLabel(mode) {
@@ -20,7 +24,7 @@ export function setTodayLabel(mode) {
 
 /**
  * The Job | Student table for one session view.
- * `editable` is a placeholder for T13 (per-row teacher actions); false for now.
+ * `editable` (unlocked and not a past day) adds the per-row teacher actions.
  */
 export function renderSessionTable(session, { editable = false } = {}) {
   return h(
@@ -31,13 +35,13 @@ export function renderSessionTable(session, { editable = false } = {}) {
       h("tr", {},
         h("th", { scope: "col" }, "Job"),
         h("th", { scope: "col" }, "Student"))),
-    h("tbody", {}, session.roles.map((role) => roleRow(role, editable))),
+    h("tbody", {}, session.roles.map((role) => roleRow(session, role, editable))),
   );
 }
 
 /** One Job | Student row: icon + name (+ description), name large, swap/manual chips. */
-function roleRow(role, editable) {
-  const { job, student, source, note } = role;
+function roleRow(session, role, editable) {
+  const { job, student, source, note, projected } = role;
   const jobCell = h("td", { class: "job" },
     job.icon ? h("span", { class: "job-icon" }, job.icon) : null,
     h("span", { class: "job-name" }, job.name));
@@ -53,7 +57,16 @@ function roleRow(role, editable) {
     if (source === "manual") {
       studentCell.append(h("span", { class: "chip chip-manual" }, "Set by teacher"));
     }
-    // editable (T13): per-row teacher actions go here.
+  }
+  if (editable) {
+    // Projected rows have no stored assignment, so "Leave empty" would 404;
+    // the other two actions work on projected picks (they create stored rows).
+    const buttons = [h("button", { type: "button", class: "act", onclick: () => openChangeDialog(session, role) }, "Change student")];
+    if (student !== null) {
+      buttons.unshift(h("button", { type: "button", class: "act", onclick: () => openAbsentDialog(session, role) }, "Absent"));
+      if (!projected) buttons.push(h("button", { type: "button", class: "act", onclick: () => clearAssignment(session, role) }, "Leave empty"));
+    }
+    studentCell.append(h("div", { class: "row-actions" }, ...buttons));
   }
   return h("tr", {}, jobCell, studentCell);
 }
@@ -80,6 +93,8 @@ function dayCard(session, data) {
   const card = h("div", {
     class: "card day-card" + (session.status === "cancelled" ? " cancelled" : ""),
   }, head, body);
+  // Unlocked viewers get the teacher actions; past days are read-only.
+  const editable = isUnlocked() && !session.is_past;
   if (session.status === "cancelled") {
     body.append(h("p", { class: "day-msg" }, "No class — the teacher is away."));
     if (session.note) body.append(h("p", { class: "day-msg" }, session.note));
@@ -87,13 +102,21 @@ function dayCard(session, data) {
       body.append(h("p", { class: "day-msg day-msg-strong" },
         `Roles move to ${longDate(data.next_held.date)}`));
     }
+    if (editable) {
+      body.append(h("div", { class: "card-actions" },
+        h("button", { type: "button", class: "act", onclick: () => openRestoreConfirm(session) }, "Bring back this day")));
+    }
     return card;
   }
   if (session.roles.length === 0) {
     body.append(h("p", { class: "day-msg" }, "No jobs yet. Teacher tools → Jobs to add some."));
-    return card;
+  } else {
+    body.append(renderSessionTable(session, { editable }));
   }
-  body.append(renderSessionTable(session, { editable: false }));
+  if (editable) {
+    body.append(h("div", { class: "card-actions" },
+      h("button", { type: "button", class: "act", onclick: () => openShiftDialog(session) }, "Teacher away — shift this day")));
+  }
   return card;
 }
 
@@ -146,12 +169,13 @@ async function load() {
   clear(panel);
   panel.append(skeletonCard());
   try {
-    const data = await api.get("/api/today");
-    if (lastToday !== null && data.today !== lastToday) {
+    const fresh = await api.get("/api/today");
+    if (lastToday !== null && fresh.today !== lastToday) {
       state.config = await api.get("/api/config"); // midnight passed; refresh shared state
     }
-    lastToday = data.today;
-    render(data);
+    lastToday = fresh.today;
+    lastData = fresh;
+    render(fresh);
   } catch (err) {
     console.error(err);
     showError();
@@ -172,6 +196,11 @@ function render(data) {
   }
 }
 
+/** Re-draw from the cached response: the button set depends on lock state. */
+function onLockChange() {
+  if (lastData !== null) render(lastData);
+}
+
 /**
  * Render Tab 1 into panelEl: fetch /api/today, then keep it fresh every 5
  * minutes and whenever the page becomes visible again.
@@ -185,6 +214,10 @@ export function renderToday(panelEl) {
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") load();
     });
+  }
+  if (!lockListenerOn) {
+    lockListenerOn = true;
+    window.addEventListener("kr:lockchange", onLockChange);
   }
   load();
 }

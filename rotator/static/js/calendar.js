@@ -4,16 +4,17 @@
 import { h, clear } from "./dom.js";
 import { api } from "./api.js";
 import { state } from "./app.js"; // referenced at call time only (circular import is safe)
+import { isUnlocked } from "./auth.js";
 import { renderSessionTable } from "./today.js";
 import { hijriDate, longDate, shortDate } from "./dates.js";
 const NARROW = window.matchMedia("(max-width: 700px)");
 const WEEKDAY_HEADS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-let panel = null;       // #panel-calendar, set on the first renderCalendar()
-let month = null;       // the "YYYY-MM" currently shown
-let data = null;        // the last successful /api/calendar response
-let inflight = false;   // guard against overlapping loads
-let listenerOn = false; // the single matchMedia change listener
+let panel = null;         // #panel-calendar, set on the first renderCalendar()
+let month = null;         // the "YYYY-MM" currently shown
+let data = null;          // the last successful /api/calendar response
+let inflight = false;     // guard against overlapping loads
+let listenerOn = false;   // the single matchMedia change listener
 
 const utcNoon = (iso) => {
   const [y, m, d] = iso.split("-").map(Number);
@@ -21,6 +22,12 @@ const utcNoon = (iso) => {
 };
 const pad = (n) => String(n).padStart(2, "0");
 const isoOf = (y, m, d) => `${y}-${pad(m)}-${pad(d)}`;
+
+/** Re-fetch the current month and re-render it (keeps the cache fresh). */
+export function refreshCalendar() {
+  if (panel === null || month === null || data === null) return Promise.resolve();
+  return load();
+}
 
 /** Approximate Hijri month range for the month's class days ("Rajab 1448 AH"). */
 function hijriRange(sessions) {
@@ -33,16 +40,14 @@ function hijriRange(sessions) {
   } catch {
     return ""; // browser without the Umm al-Qura calendar
   }
-  const first = fmt.format(utcNoon(sessions[0].date));
-  const last = fmt.format(utcNoon(sessions[sessions.length - 1].date));
+  const first = fmt.format(utcNoon(sessions[0].date)),
+    last = fmt.format(utcNoon(sessions[sessions.length - 1].date));
   return first === last ? first : `${first} – ${last}`;
 }
 
 /** The month's session views keyed by ISO date. */
 function sessionByDate() {
-  const map = {};
-  for (const session of data.sessions) map[session.date] = session;
-  return map;
+  return Object.fromEntries(data.sessions.map((s) => [s.date, s]));
 }
 
 /** ‹ Previous / month label + Hijri range / Next › / This month. */
@@ -50,8 +55,7 @@ function toolbar() {
   const current = state.config ? state.config.today.slice(0, 7) : null;
   return h("div", { class: "cal-toolbar" },
     h("button", { type: "button", class: "btn btn-secondary cal-nav", disabled: data.prev === null, onclick: () => goMonth(data.prev) }, "‹ Previous"),
-    h("div", { class: "cal-month" },
-      h("span", { class: "cal-month-name" }, data.label),
+    h("div", { class: "cal-month" }, h("span", { class: "cal-month-name" }, data.label),
       h("span", { class: "cal-month-hijri" }, hijriRange(data.sessions))),
     h("button", { type: "button", class: "btn btn-secondary cal-nav", disabled: data.next === null, onclick: () => goMonth(data.next) }, "Next ›"),
     h("button", { type: "button", class: "btn btn-secondary cal-nav", disabled: current !== null && current === month, onclick: () => goMonth(current) }, "This month"));
@@ -70,8 +74,7 @@ function roleLine(role) {
     h("span", { class: "cal-role" }, `${job.name} — ${student ? student.name : "No one"}`));
   if (source === "swap") {
     const mark = h("span", { class: "cal-swap", "aria-hidden": "true" }, "⇄");
-    if (note) mark.title = note;
-    line.append(mark);
+    if (note) mark.title = note; line.append(mark);
   }
   return line;
 }
@@ -133,9 +136,7 @@ function buildWeekends() {
     const first = group.saturday || group.sunday;
     const block = h("div", { class: "cal-weekend" },
       h("h3", { class: "cal-weekend-title" }, `Weekend of ${shortDate(first.date)}`));
-    for (const session of [group.saturday, group.sunday]) {
-      if (session) block.append(weekendCell(Number(session.date.slice(8, 10)), session.date, session, today, true));
-    }
+    for (const s of [group.saturday, group.sunday]) if (s) block.append(weekendCell(Number(s.date.slice(8, 10)), s.date, s, today, true));
     wrap.append(block);
   }
   return wrap;
@@ -153,20 +154,19 @@ function openDayDialog(session) {
   } else if (session.roles.length === 0) {
     body.append(h("p", { class: "day-msg" }, "No jobs yet. Teacher tools → Jobs to add some."));
   } else {
-    body.append(renderSessionTable(session, { editable: false }));
+    body.append(renderSessionTable(session, { editable: isUnlocked() }));
   }
   const badge = session.status === "cancelled" ? h("span", { class: "badge badge-noclass" }, "No class")
     : h("span", { class: session.is_today ? "badge badge-today" : "badge badge-upcoming" }, session.is_today ? "Today" : "Upcoming");
   dialog.append(
     h("div", { class: "dialog-head" },
-      h("div", { class: "day-title-row" },
-        h("span", { class: "star", "aria-hidden": "true" }, "✶"), h("h2", { class: "day-title" }, longDate(session.date))),
+      h("div", { class: "day-title-row" }, h("span", { class: "star", "aria-hidden": "true" }, "✶"), h("h2", { class: "day-title" }, longDate(session.date))),
       badge),
     body,
     h("div", { class: "dialog-actions" },
       h("button", { type: "button", class: "btn btn-secondary", onclick: () => dialog.close() }, "Close")));
-  // Esc closes natively; make sure focus returns to the cell that opened it.
   dialog.onclose = () => {
+    // Esc closes natively; make sure focus returns to the cell that opened it.
     if (opener && opener.isConnected) opener.focus();
   };
   dialog.showModal();
@@ -220,8 +220,7 @@ function render() {
 /** Switch months: record it in the hash (refresh/back), then load it. */
 function goMonth(target) {
   if (target === null || target === month) return;
-  month = target;
-  state.month = target;
+  month = state.month = target;
   history.pushState(null, "", `#calendar/${target}`);
   load();
 }
