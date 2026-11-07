@@ -8,7 +8,7 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [x] T00 | Scaffold, config, health endpoint, pytest fixtures | 2026-11-06: 5 tests passing; dev server serves /api/health. See NOTES.md for pytest.ini addition.
 | [x] T01 | SQLite schema + db helpers + settings | 2026-11-06: 13 tests passing (8 new). |
 | [x] T02 | Dates module (Central time, class days) | 2026-11-06: 31 tests passing (18 new). |
-| [ ] T03 | Scheduler core (pure fairness algorithm) | |
+| [x] T03 | Scheduler core (pure fairness algorithm) | 2026-11-06: 43 tests passing (12 new); purity grep clean. |
 | [ ] T04 | Roster API: students, jobs, volunteers | |
 | [ ] T05 | Schedule service: freeze + build sessions | |
 | [ ] T06 | Read API: config, today, calendar, queue | |
@@ -23,5 +23,5 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [ ] T15 | Demo seed, smoke script, acceptance pass, polish | |
 | [ ] T16 | Deploy to home server (human-run checklist) | |
 
-Last session: T02 done 2026-11-06 (31 tests passing)
-Total tests passing: 31
+Last session: T03 done 2026-11-06 (43 tests passing)
+Total tests passing: 43
