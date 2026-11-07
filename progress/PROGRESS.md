@@ -11,7 +11,7 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [x] T03 | Scheduler core (pure fairness algorithm) | 2026-11-06: 43 tests passing (12 new); purity grep clean. |
 | [x] T04 | Roster API: students, jobs, volunteers | 2026-11-06: 57 tests passing (14 new); see NOTES.md for job re-activation choice. |
 | [x] T05 | Schedule service: freeze + build sessions | 2026-11-06: 67 tests passing (10 new); see NOTES.md for walk/queue_status interpretation. |
-| [ ] T06 | Read API: config, today, calendar, queue | |
+| [x] T06 | Read API: config, today, calendar, queue | 2026-11-07: 81 tests passing (14 new); curl of /api/today?today=2026-11-06 verified on live server. |
 | [ ] T07 | Actions: absent swap, cancel/restore day, manual override | |
 | [ ] T08 | Admin PIN, rate limit, export/import | |
 | [ ] T09 | Frontend shell, Islamic theme, tabs | |
@@ -23,5 +23,5 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [ ] T15 | Demo seed, smoke script, acceptance pass, polish | |
 | [ ] T16 | Deploy to home server (human-run checklist) | |
 
-Last session: T05 done 2026-11-06 (67 tests passing)
-Total tests passing: 67
+Last session: T06 done 2026-11-07 (81 tests passing)
+Total tests passing: 81

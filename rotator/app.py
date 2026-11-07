@@ -66,8 +66,10 @@ def create_app(config: dict | None = None) -> Flask:
         return send_from_directory(app.static_folder, "index.html")
 
     from .routes_roster import bp as roster_bp   # lazy: routes import get_conn from here
+    from .routes_schedule import bp as schedule_bp
 
     app.register_blueprint(roster_bp)
+    app.register_blueprint(schedule_bp)
 
     return app
 
