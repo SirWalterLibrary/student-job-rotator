@@ -11,6 +11,12 @@ Agent: append here. Keep entries short and dated.
 - T07: `set_manual` rejects a student only when they hold a *different* job that day, per spec 04's "must not have a role that day (or already hold the same job)".
 - T07: the dev machine's clock is 2026-11-06 (Friday, Central), so `central_today()` matches the fixture dates in tests; every test passes `?today=` and conftest enables the override.
 
+- T08: the task puts the `TRUST_PROXY` ProxyFix under `routes_admin.py`, but `app.wsgi_app` only exists in `app.create_app`, so the ProxyFix wrap lives in `app.py` (one line, after blueprint registration).
+- T08: `require_pin` checks the per-IP block (429) *before* the PIN (401), so a blocked IP gets 429 even with the right PIN; a *missing* header does not count as a failure (only wrong PINs do, per spec 05).
+- T08: added a `FailureLimiter.reset(key)` helper (in-memory dict cleanup) so tests can start unblocked; routes share one process-wide limiter, lazily created in `rotator/auth.py`.
+- T08: import validates the whole dump (version 1, all six tables, per-column types) *before* touching the DB, then deletes + inserts in one `with conn:` transaction; table names come from an internal dict, never user input.
+- T08: a stale dev server from the T06 session was still listening on :5055 during the live smoke test (old code); killed it and re-verified on a fresh server.
+
 ## BLOCKED
 - BLOCKED sync: T00 — `git push -u origin HEAD` failed: `fatal: could not read Username for 'https://github.com': Device not configured` (remote https://github.com/SirWalterLibrary/student-job-rotator.git; no stored credentials). The earlier `git pull --rebase` also failed only because origin has no branches yet and the local branch had no upstream. Commit 7473da5 ("T00: scaffold, config, health endpoint, pytest fixtures") is local; push it once GitHub credentials are available.
 - BLOCKED sync: T01 (2026-11-06) — same auth failure on `git push -u origin HEAD`: `fatal: could not read Username for 'https://github.com': Device not configured`. `git fetch` succeeds (public repo) but origin still has no branches, so `git pull --rebase` fails only for lack of upstream. Local commits 7473da5 (T00), c6fd7d6 (T00 note), 3f6208a (T01) are unpushed; push them once GitHub push credentials are configured.

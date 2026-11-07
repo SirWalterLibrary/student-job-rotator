@@ -2,8 +2,9 @@
 import functools
 from datetime import date
 
-from flask import current_app, request
+from flask import current_app, jsonify, request
 
+from .auth import limiter, pin_ok
 from .dates import central_today, parse_iso
 from .errors import RotatorError
 
@@ -28,10 +29,23 @@ def json_body() -> dict:
 
 
 def require_pin(fn):
-    """No-op PIN guard for mutating routes (T08 makes it real)."""
+    """Admin PIN guard: X-Admin-Pin header (401 if missing/wrong, 429 if blocked).
+
+    Passes through when no ADMIN_PIN is configured. Wrong PINs count as
+    failures against the shared per-IP FailureLimiter.
+    """
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
+        key = request.remote_addr or "unknown"
+        lim = limiter()
+        if lim.blocked(key):
+            return jsonify({"error": "Too many failed attempts, try again later"}), 429
+        provided = request.headers.get("X-Admin-Pin")
+        if not pin_ok(current_app.config, provided if provided is not None else ""):
+            if provided is not None:
+                lim.record(key)
+            return jsonify({"error": "Teacher PIN required"}), 401
         return fn(*args, **kwargs)
 
     return wrapper
