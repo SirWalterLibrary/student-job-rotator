@@ -22,6 +22,7 @@ Agent: append here. Keep entries short and dated.
 
 - T10: `js/today.js` imports `state` from `app.js` (a circular ESM import, safe because it is only dereferenced at call time) so the midnight-crossing path can refresh the shared `state.config`.
 - T10: the "Tomorrow: Sunday, November 8" line is computed from the Saturday session's date (server's `upcoming_weekend` returns a single session on class days, so the Sunday isn't in the response); it links to `#calendar/YYYY-MM` per spec 06, which app.js's existing hash routing already resolves.
+- T10: the new component rules first pushed `css/layout.css` to 288 lines, over the 250-line rule; compacted by removing blank lines between rules and putting small rules on one line (243 lines now, same rules).
 - T10: no browser on the dev machine, so the UI was verified with a Node DOM-stub harness driving the real modules against the live server (scenarios: Friday two-card with cancelled Sunday, Saturday one-card + tomorrow line, fully-cancelled Saturday with "Roles move to…", 500 → friendly error + Retry, visibilitychange refresh + `today` change → `/api/config` reload). `pytest -q`: 110 passing (unchanged, frontend-only task, same as T09).
 
 ## BLOCKED
