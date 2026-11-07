@@ -1,10 +1,11 @@
 // Boot: load config, render the selected tab, and wire tab routing (hash + arrow keys).
 // T10 renders Tab 1 (today.js); T11 renders Tab 2 (calendar.js).
 
-import { h, clear, toast } from "./dom.js";
-import { api, storedPin } from "./api.js";
+import { h, clear } from "./dom.js";
+import { api } from "./api.js";
 import { renderToday, setTodayLabel } from "./today.js";
 import { renderCalendar } from "./calendar.js";
+import { initAuth } from "./auth.js";
 
 /** Shared app state, imported by the other modules. */
 export const state = {
@@ -78,14 +79,9 @@ function wireTabs() {
   });
 }
 
-/** Wire the (still inert) Teacher tools button and lock events. */
+/** Wire the Teacher tools button and PIN lock/unlock (auth.js + manage.js). */
 function wireHeader() {
-  document.getElementById("teacher-tools").addEventListener("click", () => {
-    toast("Teacher tools are coming soon.");
-  });
-  window.addEventListener("kr:locked", () => {
-    state.unlocked = false;
-  });
+  initAuth();
 }
 
 async function boot() {
@@ -99,7 +95,6 @@ async function boot() {
     panel.append(h("p", { class: "placeholder" }, "Could not reach the Khidmah Roster. Is the server running?"));
     return;
   }
-  state.unlocked = !state.config.pin_required || Boolean(storedPin());
   wireTabs();
   wireHeader();
   applyHash(); // honors #calendar or #calendar/YYYY-MM on reload; no-op otherwise
