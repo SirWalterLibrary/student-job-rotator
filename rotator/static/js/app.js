@@ -1,9 +1,10 @@
 // Boot: load config, render the selected tab, and wire tab routing (hash + arrow keys).
-// T10 renders Tab 1 (today.js); T11 renders Tab 2.
+// T10 renders Tab 1 (today.js); T11 renders Tab 2 (calendar.js).
 
 import { h, clear, toast } from "./dom.js";
 import { api, storedPin } from "./api.js";
 import { renderToday, setTodayLabel } from "./today.js";
+import { renderCalendar } from "./calendar.js";
 
 /** Shared app state, imported by the other modules. */
 export const state = {
@@ -35,7 +36,10 @@ function selectTab(name, month) {
     document.getElementById(tab.panel).hidden = !selected;
   }
   if (name === "today") renderToday(document.getElementById("panel-today"));
-  if (name === "calendar") state.month = month || (state.config ? state.config.today.slice(0, 7) : null);
+  if (name === "calendar") {
+    state.month = month || state.month || (state.config ? state.config.today.slice(0, 7) : null);
+    renderCalendar(document.getElementById("panel-calendar"), state.month);
+  }
   const hash = name === "calendar" ? (state.month ? `#calendar/${state.month}` : "#calendar") : "#today";
   if (location.hash !== hash) history.pushState(null, "", hash);
 }
@@ -45,7 +49,10 @@ function applyHash() {
   const [name, month] = location.hash.slice(1).split("/");
   const tab = name === "calendar" ? "calendar" : "today";
   if (tab !== state.tab) selectTab(tab, month || null);
-  else if (tab === "calendar" && month && month !== state.month) state.month = month;
+  else if (tab === "calendar" && month && month !== state.month) {
+    state.month = month;
+    renderCalendar(document.getElementById("panel-calendar"), month);
+  }
 }
 
 /** Fetch /api/today once to choose the Tab 1 label ("Today" / "Next Weekend"). */

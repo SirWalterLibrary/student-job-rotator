@@ -1,0 +1,199 @@
+/* Khidmah Roster — Tab 2 monthly calendar (specs 06 + 07).
+   Kept out of layout.css to hold it under the 250-line rule. */
+
+/* Toolbar: nav buttons, month label, approximate Hijri range. */
+.cal-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.cal-nav {
+  min-height: 44px;
+  padding: 8px 16px;
+}
+.cal-month {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0 4px;
+}
+.cal-month-name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--emerald-900);
+}
+.cal-month-hijri {
+  font-size: .8rem;
+  color: var(--ink-soft);
+}
+
+/* Grid: narrow Mon–Fri, wide Sat/Sun (spec 06). */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 0.45fr) 2fr 2fr;
+  gap: 6px;
+}
+.cal-head {
+  padding: 2px 6px;
+  text-align: center;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* Cell base; Mon–Fri are transparent with a faint number. */
+.cal-cell {
+  min-height: 76px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: transparent;
+}
+.cal-cell.weekday {
+  text-align: center;
+  color: var(--ink-soft);
+  opacity: .65;
+}
+.cal-cell.blank {
+  min-height: 0;
+  padding: 0;
+}
+/* Weekend cells are real buttons. */
+button.cal-cell {
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  background-color: var(--sand);
+  border: 1px solid var(--gold-500);
+  transition: background-color 150ms ease;
+}
+button.cal-cell:hover { background-color: var(--emerald-100); }
+button.cal-cell:focus-visible {
+  outline: 3px solid var(--gold-500);
+  outline-offset: 2px;
+}
+
+/* Cell contents. */
+.cal-top {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.cal-num { font-weight: 700; }
+.cal-hijri {
+  font-size: .72rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal-role-line {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 3px;
+}
+.cal-role {
+  flex: 1;
+  min-width: 0;
+  font-size: .84rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal-swap {
+  color: var(--emerald-700);
+  font-weight: 700;
+}
+.cal-noclass {
+  display: block;
+  margin-top: 3px;
+  font-size: .84rem;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+/* Cell states: today ring, past dim, cancelled diagonal pattern. */
+.cal-cell.today { box-shadow: 0 0 0 2px var(--gold-500); }
+.cal-cell.past { opacity: .55; }
+.cal-cell.empty { opacity: .65; }
+.cal-cell.cancelled {
+  background-image: repeating-linear-gradient(45deg, transparent 0 6px, rgba(20, 33, 61, .08) 6px 12px);
+}
+
+/* Narrow screens (<700px): weekends stacked as blocks. */
+.cal-weekends { display: block; }
+.cal-weekend {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--gold-500);
+  border-radius: var(--radius);
+  background-color: var(--cream);
+  box-shadow: var(--shadow);
+}
+.cal-weekend-title {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  color: var(--emerald-900);
+}
+.cal-weekend .cal-cell { margin-bottom: 8px; min-height: 0; }
+.cal-weekend .cal-cell:last-child { margin-bottom: 0; }
+
+/* Day dialog (specs 06 + 07: midnight header, gold rule, cream body). */
+#dialog { width: min(560px, 92vw); }
+.dialog-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: var(--midnight);
+  border-bottom: 2px solid var(--gold-500);
+  color: #ffffff;
+}
+.dialog-head .day-title { margin: 0; color: #ffffff; font-size: 1.15rem; }
+.dialog-body { padding: 16px; }
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 16px 16px;
+}
+
+@media (max-width: 700px) {
+  .cal-grid { display: none; } /* belt and braces; only one path renders */
+}
+
+/* Print: the month grid in black on white. */
+@media print {
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+  .site-header, .site-footer, .tabs, .toast-host, #drawer, .cal-nav, .skeleton {
+    display: none !important;
+  }
+  #panel-today { display: none !important; }
+  #panel-calendar { display: block !important; }
+  .cal-month-name, .cal-month-hijri, .cal-head, .cal-num,
+  .cal-hijri, .cal-role, .cal-swap, .cal-noclass, .cal-weekend-title {
+    color: #000000;
+  }
+  .cal-cell.past, .cal-cell.weekday, .cal-cell.empty { opacity: .7; }
+  button.cal-cell, .cal-weekend, .card {
+    background-color: #ffffff;
+    background-image: none;
+    border-color: #000000;
+    box-shadow: none;
+  }
+  .cal-cell.cancelled {
+    background-image: repeating-linear-gradient(45deg, transparent 0 6px, rgba(0, 0, 0, .15) 6px 12px);
+  }
+  .cal-cell.today { box-shadow: none; outline: 2px solid #000000; }
+}

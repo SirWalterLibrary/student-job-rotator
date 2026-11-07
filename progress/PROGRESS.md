@@ -16,12 +16,12 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [x] T08 | Admin PIN, rate limit, export/import | 2026-11-07: 110 tests passing (12 new); live curl verified 401/429/201 + export. See NOTES.md. |
 | [x] T09 | Frontend shell, Islamic theme, tabs | 2026-11-07: 110 tests passing (no new tests); live server + Node DOM-stub smoke verified tabs, hash routing, 401 lock. See NOTES.md for /static/ path note. |
 | [x] T10 | Tab 1: Today / Next weekend | 2026-11-07: 110 tests passing (no new tests); Node DOM-stub against live server verified Friday two-card (Next Weekend), Saturday one-card (Today + tomorrow line), cancelled card (note + roles-move, no table), 500→error+Retry, visibilitychange + midnight config reload. See NOTES.md. |
-| [ ] T11 | Tab 2: Monthly calendar | |
+| [x] T11 | Tab 2: Monthly calendar | 2026-11-07: 110 tests passing (no new tests, frontend-only); Node DOM-stub against live server: 35 checks (grid, nav disable rules, cancelled/swap states, dialog + focus return, narrow stacked weekends, error/Retry, exact role match vs API). See NOTES.md. |
 | [ ] T12 | Teacher tools drawer: students, jobs, volunteers, up-next, settings | |
 | [ ] T13 | Action dialogs: absent swap, shift day, manual change, PIN unlock | |
 | [ ] T14 | Dockerize (dev + prod compose) | |
 | [ ] T15 | Demo seed, smoke script, acceptance pass, polish | |
 | [ ] T16 | Deploy to home server (human-run checklist) | |
 
-Last session: T10 done 2026-11-07 (110 tests passing)
+Last session: T11 done 2026-11-07 (110 tests passing)
 Total tests passing: 110
