@@ -1,0 +1,48 @@
+CREATE TABLE IF NOT EXISTS students (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS jobs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  description TEXT NOT NULL DEFAULT '',
+  icon TEXT NOT NULL DEFAULT '',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS volunteers (
+  job_id INTEGER NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
+  student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+  joined_at TEXT NOT NULL,
+  PRIMARY KEY (job_id, student_id)
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  date TEXT PRIMARY KEY,
+  status TEXT NOT NULL DEFAULT 'held' CHECK (status IN ('held','cancelled')),
+  frozen INTEGER NOT NULL DEFAULT 0,
+  note TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS assignments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date TEXT NOT NULL,
+  job_id INTEGER NOT NULL REFERENCES jobs(id),
+  student_id INTEGER NOT NULL REFERENCES students(id),
+  source TEXT NOT NULL CHECK (source IN ('auto','swap','manual')),
+  note TEXT NOT NULL DEFAULT '',
+  group_id TEXT,
+  created_at TEXT NOT NULL,
+  UNIQUE (date, job_id),
+  UNIQUE (date, student_id)
+);
+
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);

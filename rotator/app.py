@@ -1,9 +1,10 @@
 """Flask application factory."""
 import os
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, current_app, g, jsonify, request, send_from_directory
 
 from .config import load_config
+from .db import connect, init_db
 from .errors import RotatorError
 
 
@@ -16,6 +17,12 @@ def create_app(config: dict | None = None) -> Flask:
 
     app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.update(cfg)
+
+    bootstrap = connect(os.path.join(cfg["DATA_DIR"], "rotator.db"))
+    try:
+        init_db(bootstrap)
+    finally:
+        bootstrap.close()
 
     @app.errorhandler(RotatorError)
     def handle_rotator_error(err: RotatorError):
@@ -33,6 +40,13 @@ def create_app(config: dict | None = None) -> Flask:
     def handle_server_error(err):
         """Return a JSON 500."""
         return jsonify({"error": "Server error"}), 500
+
+    @app.teardown_appcontext
+    def close_conn(err):
+        """Close the per-request database connection."""
+        conn = g.pop("conn", None)
+        if conn is not None:
+            conn.close()
 
     @app.after_request
     def no_cache(response):
@@ -52,3 +66,11 @@ def create_app(config: dict | None = None) -> Flask:
         return send_from_directory(app.static_folder, "index.html")
 
     return app
+
+
+def get_conn():
+    """Return the current request's database connection, creating it on first use."""
+    if not hasattr(g, "conn"):
+        path = os.path.join(current_app.config["DATA_DIR"], "rotator.db")
+        g.conn = connect(path)
+    return g.conn
