@@ -8,7 +8,7 @@ Demo data = `scripts/seed_demo.py`: 6 jobs, 10 students, overlapping volunteers,
 | 1 | Add jobs / volunteers | Teacher tools: add a job and a student, tick the student as volunteer; it appears in Fairness panel |
 | 2 | Islamic theme | Bismillah header, emerald/gold/cream, star pattern, Arabic footer text renders right-to-left |
 | 3 | Sat + Sun rotation | `/api/calendar?month=2026-11` shows both days for each weekend with different students |
-| 4 | No repeat until all served | `scripts/smoke.py` simulates 12 weekends: for every job each pick is the first available person in that job's queue, so nobody repeats while an available volunteer with an older turn is waiting |
+| 4 | No repeat until all served | `scripts/smoke.py` simulates 12 weekends: before each Saturday it takes `/api/queue` as of the previous Saturday (the state before that weekend) and asserts each pick is the first person in that job's queue who is not busy on that Saturday, so nobody repeats while an available volunteer with an older turn is waiting |
 | 5 | No double roles | smoke script asserts no student appears twice on any day across 12 weekends |
 | 6 | Table on Sat/Sun | `?today=2026-11-07` → tab 1 shows ONE card "Today" with a Job/Student table |
 | 7 | Central time | `?today` ignored in production; unit tests for 2026-11-01/2027-03-14 UTC-vs-Central cases pass |
