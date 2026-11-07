@@ -2,9 +2,40 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Khidmah Roster</title>
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
   </head>
   <body>
-    <h1>Khidmah Roster</h1>
+    <header class="site-header">
+      <div class="header-row">
+        <button type="button" class="btn btn-secondary" id="teacher-tools">Teacher tools</button>
+      </div>
+      <div class="header-plate">
+        <p class="bismillah" lang="ar" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
+        <h1 class="title">Khidmah Roster <span class="title-ar" lang="ar">خدمة</span></h1>
+        <p class="subtitle">Weekend class jobs</p>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="tabs" role="tablist" aria-label="Sections">
+        <button type="button" role="tab" id="tab-today" data-tab="today" aria-controls="panel-today" aria-selected="true">Today</button>
+        <button type="button" role="tab" id="tab-calendar" data-tab="calendar" aria-controls="panel-calendar" aria-selected="false">Calendar</button>
+      </div>
+      <section role="tabpanel" id="panel-today" aria-labelledby="tab-today" tabindex="0"></section>
+      <section role="tabpanel" id="panel-calendar" aria-labelledby="tab-calendar" tabindex="0" hidden></section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Hijri dates are approximate.</p>
+      <p><span lang="ar" dir="rtl">جَزَاكُمُ ٱللَّهُ خَيْرًا</span> Jazakum Allahu khayran</p>
+    </footer>
+
+    <dialog id="dialog" hidden></dialog>
+    <aside id="drawer" hidden></aside>
+
+    <script type="module" src="/static/js/app.js"></script>
   </body>
 </html>

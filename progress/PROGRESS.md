@@ -14,7 +14,7 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [x] T06 | Read API: config, today, calendar, queue | 2026-11-07: 81 tests passing (14 new); curl of /api/today?today=2026-11-06 verified on live server. |
 | [x] T07 | Actions: absent swap, cancel/restore day, manual override | 2026-11-07: 98 tests passing (17 new); curl swap check: cover + make-up notes visible in /api/today and /api/calendar. See NOTES.md for vacant/clear vs walker refill. |
 | [x] T08 | Admin PIN, rate limit, export/import | 2026-11-07: 110 tests passing (12 new); live curl verified 401/429/201 + export. See NOTES.md. |
-| [ ] T09 | Frontend shell, Islamic theme, tabs | |
+| [x] T09 | Frontend shell, Islamic theme, tabs | 2026-11-07: 110 tests passing (no new tests); live server + Node DOM-stub smoke verified tabs, hash routing, 401 lock. See NOTES.md for /static/ path note. |
 | [ ] T10 | Tab 1: Today / Next weekend | |
 | [ ] T11 | Tab 2: Monthly calendar | |
 | [ ] T12 | Teacher tools drawer: students, jobs, volunteers, up-next, settings | |
@@ -23,5 +23,5 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [ ] T15 | Demo seed, smoke script, acceptance pass, polish | |
 | [ ] T16 | Deploy to home server (human-run checklist) | |
 
-Last session: T08 done 2026-11-07 (110 tests passing)
+Last session: T09 done 2026-11-07 (110 tests passing)
 Total tests passing: 110

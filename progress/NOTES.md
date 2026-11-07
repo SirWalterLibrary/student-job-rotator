@@ -16,6 +16,9 @@ Agent: append here. Keep entries short and dated.
 - T08: added a `FailureLimiter.reset(key)` helper (in-memory dict cleanup) so tests can start unblocked; routes share one process-wide limiter, lazily created in `rotator/auth.py`.
 - T08: import validates the whole dump (version 1, all six tables, per-column types) *before* touching the DB, then deletes + inserts in one `with conn:` transaction; table names come from an internal dict, never user input.
 - T08: a stale dev server from the T06 session was still listening on :5055 during the live smoke test (old code); killed it and re-verified on a fresh server.
+- T09: the task writes `<script src="js/app.js">`, but Flask serves the static folder at `/static/` (static_url_path in app.py, which this task may not touch), so index.html uses `/static/css/…` and `/static/js/app.js` — bare `js/app.js` would 404.
+- T09: no browser was scriptable on the dev machine, so the shell was verified with a small Node DOM stub driving the real modules against a live server (tab click, arrow keys, hash routing incl. `#calendar/YYYY-MM` deep link, 401 → `kr:locked`). `applyHash` also syncs `state.month` when only the hash month changes on the calendar tab, so later modules (T10/T11) react to deep links.
+- T09: kept `theme.css` under the 250-line rule by omitting blank lines between rule blocks of the same component (all spec 07 styles present).
 
 ## BLOCKED
 - BLOCKED sync: T00 — `git push -u origin HEAD` failed: `fatal: could not read Username for 'https://github.com': Device not configured` (remote https://github.com/SirWalterLibrary/student-job-rotator.git; no stored credentials). The earlier `git pull --rebase` also failed only because origin has no branches yet and the local branch had no upstream. Commit 7473da5 ("T00: scaffold, config, health endpoint, pytest fixtures") is local; push it once GitHub credentials are available.

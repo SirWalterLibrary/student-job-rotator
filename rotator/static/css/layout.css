@@ -1,0 +1,125 @@
+/* Khidmah Roster — layout and components (spec 06). */
+
+/* Page container. */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Header row (Teacher tools button, top right). */
+.header-row {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 12px 16px 0;
+}
+
+/* Tabs: pill/arch-shaped, gold-ruled when active. */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 16px;
+}
+
+.tabs [role="tab"] {
+  min-height: 44px;
+  padding: 8px 22px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 999px 999px 6px 6px;
+  background-color: transparent;
+  color: var(--emerald-900);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.tabs [role="tab"]:hover {
+  background-color: var(--emerald-100);
+}
+
+.tabs [role="tab"][aria-selected="true"] {
+  background-color: var(--emerald-700);
+  color: #ffffff;
+  border-bottom-color: var(--gold-500);
+}
+
+.tabs [role="tab"]:focus-visible {
+  outline: 3px solid var(--gold-500);
+  outline-offset: 2px;
+}
+
+/* Panels. */
+section[role="tabpanel"] {
+  min-height: 200px;
+}
+
+section[role="tabpanel"]:focus-visible {
+  outline: 3px solid var(--gold-500);
+  outline-offset: 2px;
+}
+
+.placeholder {
+  margin: 0;
+  padding: 48px 0;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+/* Card base (day cards, calendar cells). */
+.card {
+  margin-bottom: 16px;
+  border: 1px solid var(--gold-500);
+  border-radius: var(--radius);
+  background-color: var(--sand);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: var(--emerald-900);
+  color: #ffffff;
+}
+
+.card-body {
+  padding: 16px;
+}
+
+/* Responsive. */
+@media (max-width: 700px) {
+  .page {
+    padding: 12px;
+  }
+
+  .header-row {
+    padding: 8px 12px 0;
+  }
+
+  .header-plate {
+    padding: 20px 16px 16px;
+  }
+
+  .bismillah {
+    font-size: 1.4rem;
+  }
+
+  .title {
+    font-size: 1.7rem;
+  }
+
+  .tabs {
+    margin-top: 14px;
+  }
+
+  #drawer {
+    width: 100vw;
+  }
+}
