@@ -5,10 +5,12 @@ from datetime import date
 from .dates import (
     class_days,
     first_class_day_on_or_after,
+    is_class_day,
     next_class_day_after,
     parse_iso,
 )
 from .db import get_setting, set_setting, utc_now_iso
+from .errors import RotatorError
 from .scheduler import JobInfo, LastServed, pick_session, queue_order, record_picks
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -106,6 +108,25 @@ def walk(conn: sqlite3.Connection, today: date, last_date: date, write: bool):
         results[d.isoformat()] = {"picks": picks}
     conn.commit()
     return results, last
+
+
+def set_start_date(conn: sqlite3.Connection, today: date, iso_date: str) -> date:
+    """Store a new start_date: must be Sat/Sun (400) and not after any frozen session (409)."""
+    try:
+        d = parse_iso(iso_date)
+    except ValueError:
+        raise RotatorError("start_date must be YYYY-MM-DD", 400)
+    if not is_class_day(d):
+        raise RotatorError("start_date must be a Saturday or Sunday", 400)
+    if d < today:
+        raise RotatorError("start_date must be today or later", 400)
+    max_frozen = conn.execute(
+        "SELECT MAX(date) FROM sessions WHERE frozen = 1"
+    ).fetchone()[0]
+    if max_frozen is not None and d > parse_iso(max_frozen):
+        raise RotatorError("start_date may not be after a frozen session", 409)
+    set_setting(conn, "start_date", d.isoformat())
+    return d
 
 
 def freeze_through(conn: sqlite3.Connection, today: date) -> None:
