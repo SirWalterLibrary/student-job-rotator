@@ -23,7 +23,7 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [x] T15 | Demo seed, smoke script, acceptance pass, polish | 2026-11-07: seed_demo + smoke (12/12 SMOKE OK); acceptance passed (68 API checks incl. spec 09 rows + export/import + PIN limit, 35 DOM-stub UI checks, 5 scenarios; production ignores ?today); README rewritten; 110 tests unchanged. See NOTES.md for the row-10 restore nuance and the specs/09 row-4 wording fix. |
 | [x] T16 | Deploy to home server (human-run checklist) | Mohamed verified |
 | [x] T17 | Fix drawer: X button, blank panel after refresh, lock state | 2026-11-07: 112 tests passing (2 new static-asset guards); Node DOM-stub against the live server (ADMIN_PIN=1234, seeded demo, 37 checks, 4 scenarios incl. 3× refresh-while-unlocked): X/Esc close with focus return, drawer closed + "Lock" header + working buttons after every refresh, Lock persists, private window locked. Root cause A confirmed (see NOTES.md). |
-| [ ] T18 | Fix drawer scrolling and oversized form fields | |
+| [x] T18 | Fix drawer scrolling and oversized form fields | 2026-11-07: 113 tests passing (1 new static-asset guard); Node DOM-stub against the live server (demo seed, PIN 1234): 25 checks all pass (head + .drawer-body, sections inside, add form above list, job-field labels + single-line, 10 volunteer checkboxes, add round trip, Esc/focus return). See NOTES.md: root causes confirmed (flex shrink + overflow:hidden clip; flex-basis-as-height inputs); drawer rules live in manage.css, so the guard checks that file; pixel-level manual checks (scrolling, 360/1200px, focus ring) left for the teacher. |
 
-Last session: T17 done 2026-11-07 (112 tests + 37 DOM-stub checks)
-Total tests passing: 112
+Last session: T18 done 2026-11-07 (113 tests + 25 DOM-stub checks)
+Total tests passing: 113

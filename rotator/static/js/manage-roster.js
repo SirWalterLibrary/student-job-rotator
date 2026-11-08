@@ -74,7 +74,6 @@ export async function loadStudents() {
     return errorRow(body, err, loadStudents);
   }
   clear(body);
-  body.append(h("ul", { class: "roster-list" }, ...students.map((s) => studentRow(s))));
   const input = h("input", { type: "text", placeholder: "New student name", maxlength: 40 });
   const error = h("p", { class: "form-error", hidden: true });
   const form = h("form", { class: "add-form" },
@@ -98,7 +97,11 @@ export async function loadStudents() {
       error.textContent = err.message;
     }
   });
-  body.append(form);
+  // The add form goes ABOVE the list so it is never scrolled out of view (T18);
+  // a long list scrolls inside its own box (.student-list in manage.css).
+  body.append(
+    form,
+    h("ul", { class: "roster-list student-list" }, ...students.map((s) => studentRow(s))));
 }
 
 /* ---------------- Jobs ---------------- */
@@ -204,12 +207,16 @@ export async function loadJobs() {
   }
   clear(body);
   body.append(h("ol", { class: "roster-list" }, ...jobs.map((job, i) => jobRow(job, i, jobs, students))));
-  const name = h("input", { type: "text", placeholder: "Job name", maxlength: 60 });
-  const description = h("input", { type: "text", placeholder: "Short description (optional)", maxlength: 200 });
-  const icon = h("input", { type: "text", placeholder: "Icon (optional emoji)", maxlength: 8 });
+  const name = h("input", { id: "new-job-name", type: "text", placeholder: "Job name", maxlength: 60 });
+  const description = h("input", { id: "new-job-desc", type: "text", placeholder: "Short description (optional)", maxlength: 200 });
+  const icon = h("input", { id: "new-job-icon", type: "text", placeholder: "Icon (optional emoji)", maxlength: 8 });
   const error = h("p", { class: "form-error", hidden: true });
+  // Labels sit above their fields; each field is a single-line input (T18).
   const form = h("form", { class: "add-form add-job" },
-    name, description, icon, error,
+    h("label", { for: "new-job-name" }, "Job name"), name,
+    h("label", { for: "new-job-desc" }, "Short description"), description,
+    h("label", { for: "new-job-icon" }, "Icon"), icon,
+    error,
     h("button", { type: "submit", class: "btn btn-small btn-primary" }, "Add job"));
   form.addEventListener("submit", async (event) => {
     event.preventDefault();

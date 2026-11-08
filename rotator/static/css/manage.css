@@ -1,30 +1,40 @@
 /* Khidmah Roster — teacher tools drawer, PIN dialog, and drawer forms (spec 06). */
 
-/* Drawer interior (the frame itself lives in theme.css). */
+/* Drawer interior (the frame itself lives in theme.css). T18: the header is
+   fixed and .drawer-body is the only scrolling area, so no section is clipped. */
 #drawer {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  padding: 16px;
-  gap: 12px;
 }
 .drawer-head {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-bottom: 8px;
+  padding: 16px 16px 8px;
   border-bottom: 2px solid var(--gold-500);
+}
+.drawer-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .drawer-title { margin: 0; color: var(--emerald-900); }
 .drawer-close { min-width: 44px; }
 
 /* Accordion sections. */
 .drawer-section {
+  flex: 0 0 auto;  /* grows to fit its content; .drawer-body scrolls (T18) */
   border: 1px solid var(--gold-500);
   border-radius: var(--radius);
   background-color: var(--sand);
-  overflow: hidden;
+  overflow: clip;  /* round the corners only; never clips content (T18) */
 }
 .drawer-section-btn {
   width: 100%;
@@ -64,6 +74,10 @@
 .roster-name { flex: 1 1 auto; min-width: 80px; font-weight: 600; }
 .roster-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 
+/* Students list scrolls inside its own box when long (T18); the add form
+   above it stays reachable. */
+.student-list { max-height: 40vh; overflow-y: auto; }
+
 /* Compact buttons (still a 44px tap target). */
 .btn-small { min-height: 44px; padding: 6px 14px; font-size: .85rem; }
 
@@ -76,8 +90,11 @@
   margin-top: 8px;
 }
 .add-form input { flex: 1 1 120px; min-width: 90px; }
-.add-job { flex-direction: column; align-items: stretch; }
+.add-job { flex-direction: column; align-items: stretch; gap: .5rem; }
 .add-job .btn { align-self: flex-start; }
+/* Single-line fields: never stretch to fill the column (T18). */
+.add-job input { flex: 0 0 auto; width: 100%; height: 44px; }
+.add-job label { width: fit-content; }
 .drawer input[type="text"], .drawer input[type="date"], .drawer input[type="password"], .drawer input[type="file"] {
   min-height: 44px;
   padding: 6px 10px;
@@ -95,7 +112,7 @@
 .job-edit { flex-basis: 100%; margin-top: 6px; padding: 10px; background-color: var(--emerald-100); border-radius: 8px; }
 .job-edit-panel { display: flex; flex-direction: column; gap: 6px; }
 .job-edit-panel label { width: fit-content; }
-.job-edit-panel input[type="text"] { width: 100%; max-width: 300px; }
+.job-edit-panel input[type="text"] { width: 100%; max-width: 300px; height: 44px; }
 .volunteers { margin: 8px 0 0; padding: 8px 10px; border: 1px solid var(--emerald-700); border-radius: 8px; }
 .volunteers legend { font-weight: 600; padding: 0 4px; }
 .check { display: flex; align-items: center; gap: 8px; min-height: 32px; font-weight: 400; cursor: pointer; }

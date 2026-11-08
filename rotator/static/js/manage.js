@@ -19,21 +19,27 @@ export function openDrawer() {
   const box = document.getElementById("drawer");
   if (!open) {
     clear(box);
+    const body = h("div", { class: "drawer-body" });
+    body.append(
+      section("students", "Students"),
+      section("jobs", "Jobs"),
+      section("queue", "Fairness & up next"),
+      section("settings", "Settings"));
     box.append(
       h("div", { class: "drawer-head" },
         h("h2", { class: "drawer-title" }, "Teacher tools"),
         h("button", { type: "button", class: "btn btn-secondary drawer-close", "aria-label": "Close teacher tools",
           onclick: () => closeDrawer() }, "✕")),
-      section("students", "Students"),
-      section("jobs", "Jobs"),
-      section("queue", "Fairness & up next"),
-      section("settings", "Settings"));
+      body);
     box.addEventListener("keydown", trapKey);
   }
   open = true;
   box.hidden = false;
   box.setAttribute("aria-hidden", "false");
+  // Focus the first control; start the (only) scroll area at the top.
   box.querySelector(".drawer-close").focus();
+  const scrollBox = box.querySelector(".drawer-body");
+  if (scrollBox) scrollBox.scrollTop = 0;
   loadStudents();
   loadJobs();
   loadQueue();
