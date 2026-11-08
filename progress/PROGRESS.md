@@ -21,7 +21,9 @@ Use `[!]` if blocked (details go in NOTES.md). Do not reorder rows.
 | [x] T13 | Action dialogs: absent swap, shift day, manual change, PIN unlock | 2026-11-07: 110 tests passing (no new, UI-only); Node DOM-stub against the live server (ADMIN_PIN=1234, ?today=2026-11-07): 18 checks all pass (swap chip/toast/calendar ⇄, vacant + fairness, shift "No class" + Sunday equals pre-shift Saturday + restore, change options, lock, 401 re-lock, day dialog editable). See NOTES.md: one backend change (request lock in app.py — the task's refreshAll exposed a concurrency 500 in freeze_through) and the vacant-refill nuance. |
 | [x] T14 | Dockerize (dev + prod compose) | 2026-11-07: all done-when checks pass (see NOTES.md): app on :5055 + PIN 1234, student survives restart, Minnesota date, healthy, uid 10001, production exits with clear error. |
 | [x] T15 | Demo seed, smoke script, acceptance pass, polish | 2026-11-07: seed_demo + smoke (12/12 SMOKE OK); acceptance passed (68 API checks incl. spec 09 rows + export/import + PIN limit, 35 DOM-stub UI checks, 5 scenarios; production ignores ?today); README rewritten; 110 tests unchanged. See NOTES.md for the row-10 restore nuance and the specs/09 row-4 wording fix. |
-| [ ] T16 | Deploy to home server (human-run checklist) | |
+| [x] T16 | Deploy to home server (human-run checklist) | Mohamed verified |
+| [x] T17 | Fix drawer: X button, blank panel after refresh, lock state | 2026-11-07: 112 tests passing (2 new static-asset guards); Node DOM-stub against the live server (ADMIN_PIN=1234, seeded demo, 37 checks, 4 scenarios incl. 3× refresh-while-unlocked): X/Esc close with focus return, drawer closed + "Lock" header + working buttons after every refresh, Lock persists, private window locked. Root cause A confirmed (see NOTES.md). |
+| [ ] T18 | Fix drawer scrolling and oversized form fields | |
 
-Last session: T15 done 2026-11-07 (110 tests + smoke + acceptance)
-Total tests passing: 110
+Last session: T17 done 2026-11-07 (112 tests + 37 DOM-stub checks)
+Total tests passing: 112

@@ -12,27 +12,27 @@ import { renderToday } from "./today.js";
 import { renderCalendar } from "./calendar.js";
 import { loadStudents, loadJobs } from "./manage-roster.js";
 
-let opener = null; // element that opened the drawer (focus returns to it)
-let open = false;
+let open = false; // whether the drawer is currently open
 
-/** Open the drawer: build the four sections, trap focus, load their data. */
+/** Open the drawer: build the four sections, show it, trap focus, load data. */
 export function openDrawer() {
-  if (open) return;
-  open = true;
-  opener = document.activeElement;
   const box = document.getElementById("drawer");
-  clear(box);
-  box.append(
-    h("div", { class: "drawer-head" },
-      h("h2", { class: "drawer-title" }, "Teacher tools"),
-      h("button", { type: "button", class: "btn btn-secondary drawer-close", "aria-label": "Close teacher tools",
-        onclick: () => closeDrawer() }, "✕")),
-    section("students", "Students"),
-    section("jobs", "Jobs"),
-    section("queue", "Fairness & up next"),
-    section("settings", "Settings"));
+  if (!open) {
+    clear(box);
+    box.append(
+      h("div", { class: "drawer-head" },
+        h("h2", { class: "drawer-title" }, "Teacher tools"),
+        h("button", { type: "button", class: "btn btn-secondary drawer-close", "aria-label": "Close teacher tools",
+          onclick: () => closeDrawer() }, "✕")),
+      section("students", "Students"),
+      section("jobs", "Jobs"),
+      section("queue", "Fairness & up next"),
+      section("settings", "Settings"));
+    box.addEventListener("keydown", trapKey);
+  }
+  open = true;
   box.hidden = false;
-  box.addEventListener("keydown", trapKey);
+  box.setAttribute("aria-hidden", "false");
   box.querySelector(".drawer-close").focus();
   loadStudents();
   loadJobs();
@@ -40,14 +40,15 @@ export function openDrawer() {
   renderSettings();
 }
 
-/** Close the drawer and return focus to the opener. */
+/** Close the drawer (X button or Esc) and return focus to the Teacher tools button. */
 export function closeDrawer() {
-  if (!open) return;
-  open = false;
   const box = document.getElementById("drawer");
+  const wasOpen = open || !box.hidden;
+  open = false;
   box.hidden = true;
+  box.setAttribute("aria-hidden", "true");
   box.removeEventListener("keydown", trapKey);
-  if (opener && opener.isConnected) opener.focus();
+  if (wasOpen) document.getElementById("teacher-tools")?.focus();
 }
 
 /** Tab wraps inside the drawer; Esc closes it. */

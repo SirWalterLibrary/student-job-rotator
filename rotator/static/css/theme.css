@@ -1,4 +1,8 @@
 /* Khidmah Roster — design tokens and base styles (spec 07). */
+
+/* A hidden element stays hidden even when other rules set display. */
+[hidden] { display: none !important; }
+
 :root {
   --emerald-900: #0b3d2e;   /* header, headings */
   --emerald-700: #14664a;   /* primary buttons, active tab */

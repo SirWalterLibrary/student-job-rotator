@@ -82,6 +82,20 @@ export function lock() {
   closeDrawer();
 }
 
+/** Boot: re-verify a stored PIN so the header always matches the real state. */
+export async function verifyStoredPin() {
+  if (storedPin() === null) return;
+  try {
+    await api.send("POST", "/api/auth", { pin: storedPin() });
+    setUnlocked(true); // PIN still valid: stay unlocked (header says "Lock")
+  } catch (err) {
+    if (err.status === 401) { // stale PIN: header says "Teacher login" again
+      clearPin();
+      setUnlocked(false);
+    }
+  }
+}
+
 /** Wire the header button and re-lock + re-open the dialog on any 401. */
 export function initAuth() {
   setUnlocked(isUnlocked());

@@ -5,7 +5,8 @@ import { h, clear } from "./dom.js";
 import { api } from "./api.js";
 import { renderToday, setTodayLabel } from "./today.js";
 import { renderCalendar } from "./calendar.js";
-import { initAuth } from "./auth.js";
+import { initAuth, verifyStoredPin } from "./auth.js";
+import { closeDrawer } from "./manage.js"; // called at boot only (circular import is safe)
 
 /** Shared app state, imported by the other modules. */
 export const state = {
@@ -85,6 +86,7 @@ function wireHeader() {
 }
 
 async function boot() {
+  closeDrawer(); // the drawer must be closed after every refresh
   for (const tab of TABS) placeholder(tab.panel);
   try {
     state.config = await api.get("/api/config");
@@ -97,6 +99,7 @@ async function boot() {
   }
   wireTabs();
   wireHeader();
+  verifyStoredPin().catch((err) => console.error(err)); // keep the header in sync
   applyHash(); // honors #calendar or #calendar/YYYY-MM on reload; no-op otherwise
   if (state.tab === "today") {
     renderToday(document.getElementById("panel-today")); // also sets the Tab 1 label
